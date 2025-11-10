@@ -1,19 +1,46 @@
+import SearchResult from "./components/SearchResult/SearchResult.jsx";
 import styled from "styled-components";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const BASE_URL = "http://localhost:9000/"
+export const BASE_URL = "http://localhost:9000";
 
 const App = () => {
   const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const fetchFoodData = async () => {
-    const response = await fetch(BASE_URL);
+  useEffect(() => {
+    const fetchFoodData = async () => {
+      setLoading(true);
 
-    const json = await response.json();
-    setData(json);
-    setLoading(false);
-  }
+    try{  
+      const response = await fetch(BASE_URL);
+
+      const json = await response.json();
+
+      setData(json);
+      setLoading(false);
+    } catch (error) {
+      setError("Unable to fetch data");
+    }
+    };
   fetchFoodData();
+}, []);
+
+  console.log(data);
+
+//   const temp = [
+//     {
+//     name: "Boiled Egg",
+//     price: 10,
+//     text: "A boiled egg is an egg that has been cooked in its shell in boiling water. Boiled eggs can be cooked to different levels of doneness, from soft-boiled with a runny yolk to hard-boiled with a fully set yolk.",
+//     image: "/images/boiled-egg.png",
+//     type: "breakfast"
+//   },
+// ];
+
+  if(error) return <div>{error}</div>;
+  if(loading ) return <div>Loading...</div>;
 
   return( 
   <Container>
@@ -35,10 +62,7 @@ const App = () => {
       <Button>Dinner</Button>
       
     </FilterContainer>
-
-    <FoodCardContainer>
-      <FoodCards></FoodCards>
-    </FoodCardContainer>
+        <SearchResult data={data} BASE_URL={BASE_URL} />
   </Container>
   );
 };
@@ -76,17 +100,10 @@ const FilterContainer = styled.section`
   gap: 12px;
   padding-bottom: 40px;
 `;
-const Button = styled.button`
+export const Button = styled.button`
   padding: 6px 12px;
   background: #FF4343;
   border-radius: 5px;
   border: none;
   color: white;
 `; 
-
-const FoodCardContainer = styled.section`
-  height: calc(100vh - 170px);
-  background-image: url("/images/background.png");
-  background-size: cover;
-`;
-const FoodCards = styled.div``;
