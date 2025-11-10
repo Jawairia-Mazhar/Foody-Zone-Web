@@ -1,9 +1,11 @@
 import styled from 'styled-components';
+import { BASE_URL, Button, Container } from '../../App';
 
-const SearchResult = ({ data, BASE_URL }) => {
+const SearchResult = ({ data }) => {
   return (
     <FoodCardContainer>
-      <FoodCards>
+      <Container>
+        <FoodCards>
         {data?.map((food) => (
             <FoodCard key={food.name}>
                 <div className='food_image'>
@@ -20,17 +22,26 @@ const SearchResult = ({ data, BASE_URL }) => {
             </FoodCard>
         ))}
       </FoodCards>
+      </Container>
     </FoodCardContainer>   
     );
 };
 
 export default SearchResult;
 const FoodCardContainer = styled.section`
-  height: calc(100vh - 170px);
+  min-height: calc(100vh - 170px);
   background-image: url("/images/background.png");
   background-size: cover;`;
 
-const FoodCards = styled.div``;
+const FoodCards = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    row-gap: 32px;
+    column-gap: 20px;
+    justify-content: center;
+    align-items: center;
+    padding-top: 80px;
+`;
 const FoodCard = styled.div`
     width: 340px;
     height: 167px;
@@ -78,12 +89,4 @@ const FoodCard = styled.div`
         font-size: 12px;
     }
   }
-`;
-const Button = styled.button`
-  padding: 6px 12px;
-  background: #FF4343;
-  border-radius: 5px;
-  border: none;
-  color: white;
-  font-size: 12px;
 `;

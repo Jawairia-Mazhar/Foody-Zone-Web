@@ -6,8 +6,10 @@ export const BASE_URL = "http://localhost:9000";
 
 const App = () => {
   const [data, setData] = useState(null);
+  const [filteredData, setFilteredData] = useState(null); // Search Filter State
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [selectedBtn, setSelectedBtn] = useState("all");
 
   useEffect(() => {
     const fetchFoodData = async () => {
@@ -19,6 +21,7 @@ const App = () => {
       const json = await response.json();
 
       setData(json);
+      setFilteredData(json);
       setLoading(false);
     } catch (error) {
       setError("Unable to fetch data");
@@ -27,22 +30,59 @@ const App = () => {
   fetchFoodData();
 }, []);
 
-  console.log(data);
+  const filteredFood = (type) => {
+    if (type === "all"){
+      setFilteredData(data);
+      setSelectedBtn("all");
+      return;
+    }
+    
+    const filter = data?.filter((food) =>
+    food.type.toLowerCase().includes(type.toLowerCase())
+  );
+    setFilteredData(filter);
+    setSelectedBtn(type);
+  }
 
-//   const temp = [
-//     {
-//     name: "Boiled Egg",
-//     price: 10,
-//     text: "A boiled egg is an egg that has been cooked in its shell in boiling water. Boiled eggs can be cooked to different levels of doneness, from soft-boiled with a runny yolk to hard-boiled with a fully set yolk.",
-//     image: "/images/boiled-egg.png",
-//     type: "breakfast"
-//   },
-// ];
+  const filterBtns = [
+    {
+      name: "All",
+      type: "all",
+    },
+    {
+      name: "Breakfast",
+      type: "breakfast",
+    },
+    {
+      name: "Lunch",
+      type: "lunch",
+    },
+    {
+      name: "Dinner",
+      type: "dinner",
+    },
+  ]
+
+  const searchFood = (e) => {
+    const searchValue = e.target.value;
+
+    console.log("Searching for:", searchValue);
+
+    if(searchValue === "") {
+      setFilteredData(null);
+    }
+
+  const filter = data?.filter((food) =>
+    food.name.toLowerCase().includes(searchValue.toLowerCase())
+  );
+  setFilteredData(filter);
+  };
 
   if(error) return <div>{error}</div>;
   if(loading ) return <div>Loading...</div>;
 
   return( 
+    <> {/* react fragment */}
   <Container>
     <TopContainer>
       <div className="logo">
@@ -50,32 +90,33 @@ const App = () => {
       </div>
 
       <div className="search">
-        <input placeholder="Search Food" />
+        <input onChange={searchFood} placeholder="Search Food" />
       </div>
 
     </TopContainer>
 
     <FilterContainer>
-      <Button>All</Button>
-      <Button>Breakfast</Button>
-      <Button>Lunch</Button>
-      <Button>Dinner</Button>
-      
+      {filterBtns.map((value) => (
+          <Button key ={value.name} onClick={() => filteredFood(value.type)}>
+            {value.name}
+          </Button>
+        ))  
+      }
     </FilterContainer>
-        <SearchResult data={data} BASE_URL={BASE_URL} />
   </Container>
+        <SearchResult data={filteredData} />
+    </>
   );
 };
 
 export default App;
 
-const Container = styled.div`
+export const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  // overflow: hidden;
 `;
 const TopContainer = styled.section`
-  min-height: 140px;
+  height: 100px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -90,7 +131,16 @@ const TopContainer = styled.section`
       height: 40px;
       font-size: 16px;
       padding: 0 10px;
+      placeholder {
+        color: white;
+      }
     }
+  }
+
+  @media (0 < width < 600px){
+    flex-direction: column;
+    height: 120px;
+
   }
 `;
 
@@ -102,8 +152,12 @@ const FilterContainer = styled.section`
 `;
 export const Button = styled.button`
   padding: 6px 12px;
-  background: #FF4343;
+  background: #FF4363;
   border-radius: 5px;
   border: none;
   color: white;
+  cursor: pointer;
+  &:hover{
+    background: #ff4310;
+  }
 `; 
